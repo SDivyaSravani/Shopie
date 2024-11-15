@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <title>Meesho</title>
+
+    <script type="text/javascript">
+        function bodyLoad(){
+
+            fetch("../data/meproducts.json")
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(products){
+                products.map(function(product){
+                    var div = document.createElement("div");
+                    div.className = "card m-2 p-2 col-3 align-items-center ms-3";
+                    div.style.width = "23%";
+                    div.innerHTML = `<div class="card-body"><div><img src= ${product.image} height="300"></div>
+                                    <div class="h5 text-gray">${product.title}</div>
+                                    <div class="h4">${(product.price).toLocaleString('en-IN',{style:"currency",currency:"INR"})}</div>
+                                    <div class="mb-2" bgcolor="gray">${product.delivery}</div>
+                                    <div class="row">
+                                        <div class="col-9"><span class="bg-success text-white p-1 rounded rounded-2">${product.ratings.rate} <span class="bi bi-star-fill"></span></span><span class="ms-1 text-gray me-2">${product.ratings.count} Reviews</span></div> 
+                                        <div class="col-3" id="brandImg"><img src=${product.Brand}></div>   
+                                    </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-0">
+                                        <button onclick="AddClick(${product.id})" class="btn btn-danger w-100">
+                                            <span class="bi bi-cart4"></span> Add to Cart
+                                        </button>
+                                    </div>`;
+                                    
+                                    document.querySelector("main").appendChild(div);
+                                
+                })
+            })
+        }
+
+        var cartItems = [];
+
+        function GetCount(){
+            document.getElementById("itemCount").innerHTML = cartItems.length;
+        }
+
+        function AddClick(id){
+            
+            fetch(`../data/meproducts.json`)
+            .then(function(response){
+                return response.json();
+            })
+            .then(function(products){
+                var product = products[id-1];
+                cartItems.push(product);
+                
+                GetCount();
+            })
+        }
+
+        
+        var itemPrice = [];
+        function GetPrice(){
+            var totalPrice = 0;
+            for (var price of itemPrice){
+                totalPrice = totalPrice + parseInt(price);
+            }
+            document.getElementById("TotalPrice").innerHTML = `&#8377;${totalPrice}`;
+        }
+
+        function ShowCartItems(){
+            document.querySelector("tbody").innerHTML = "";
+            cartItems.map(function(item){
+                itemPrice.push(item.price);
+                GetPrice();
+                var tr = document.createElement("tr");
+                var tdTitle = document.createElement("td");
+                var tdImage = document.createElement("td");
+                var tdPrice = document.createElement("td");
+
+                tdTitle.innerHTML = item.title;
+                tdImage.innerHTML = `<img src=${item.image} width="150" height="150">`;
+                tdPrice.innerHTML = `${item.price}`;
+
+                tr.appendChild(tdTitle);
+                tr.appendChild(tdImage);
+                tr.appendChild(tdPrice);
+
+                document.querySelector("tbody").appendChild(tr);
+                
+
+            });
+        }
+        
+    </script>
+</head>
+<body class="container-fluid" onload="bodyLoad()">
+    <header class="d-flex justify-content-between align-items-center p-4 bg-light text-danger">
+        <div class="h1">Shoppie</div>
+        <nav>
+            <span class="me-4"><a>Home</a></span>
+            <span class="me-4"><a>Electronic</a></span>
+            <span class="me-4"><a>Jewelery</a></span>
+            <span class="me-4"><a>Men's Fashion</a></span>
+            <span class="me-4"><a>Women's Fashion</a></span>
+        </nav>
+        <div>
+            <span class="bi bi-search me-3"></span>
+            <span class="bi bi-heart me-3"></span>
+
+            <button class="btn btn-dark position-relative" data-bs-target="#yourCart" data-bs-toggle="modal" onclick="ShowCartItems()"><span class="bi bi-cart3"> Your Cart<span id="itemCount" class="position-absolute top-0 end-0 badge bg-danger rounded-circle">0</span></span></button>
+        </div>
+        
+        
+    </header>
+    <section>
+        <main class="row">
+
+        </main>
+    </section>
+    <div class="modal fade" id="yourCart">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="h2 text-primary fw-bold">Your Cart Items</div>
+                    <button class="btn btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Preview</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                        <tfoot class="w-100">
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th id="TotalPrice" class="fw-bold h4"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-danger me-4">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+</body>
+</html>
